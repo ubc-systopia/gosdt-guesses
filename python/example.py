@@ -7,7 +7,8 @@ from model.threshold_guess import compute_thresholds
 from model.gosdt import GOSDT
 
 # read the dataset
-df = pd.read_csv("experiments/datasets/fico.csv", sep=";")
+df = pd.read_csv("experiments/datasets/spiral.csv", sep=";")
+# df = pd.read_csv("experiments/datasets/fico.csv", sep=";")
 X, y = df.iloc[:,:-1].values, df.iloc[:,-1].values
 h = df.columns[:-1]
 
@@ -48,10 +49,12 @@ config = {
             "regularization": 0.001,
             "similar_support": False,
             "strong_indifference": False,
-            "time_limit": 1800,
+            "time_limit": 5,
             "depth_budget": 5,
-            "warm_LB": True,
-            "path_to_labels": labelpath
+            # "warm_LB": True,
+            "path_to_labels": labelpath,
+            "worker_limit": 100,
+            # "worker_limit": 1,
         }
 
 model = GOSDT(config)
@@ -70,5 +73,6 @@ time = model.utime
 print("Model training time: {}".format(time))
 print("Training accuracy: {}".format(train_acc))
 print("# of leaves: {}".format(n_leaves))
-print(model.tree)
+print("# of nodes: {}".format(n_nodes))
+# print(model.tree)
 

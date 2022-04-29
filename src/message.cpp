@@ -51,7 +51,6 @@ Message & Message::operator=(Message const & other) {
     this -> recipient_tile = other.recipient_tile;
     this -> recipient_capture = other.recipient_capture;
     this -> recipient_feature = other.recipient_feature;
-    this -> feature = other.feature;
     this -> features = other.features;
     this -> signs = other.signs;
     this -> scope = other.scope;

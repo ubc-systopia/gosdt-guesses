@@ -209,6 +209,10 @@ void Task::send_explorer(Task const & child, float scope, int feature, unsigned 
         if (scope < child -> second.upperscope()) {
             adjacency_accessor parents;
             State::graph.edges.find(parents, child -> second.identifier()); // insert backward look-up entry
+            // Bitmask bitmask = Bitmask(State::dataset.width(), false);
+            // bitmask.set(std::abs(feature) - 1, true);
+            // std::pair<adjacency_iterator, bool> insertion = parents -> second.insert(
+            //     std::make_pair(this -> identifier(), std::make_pair(bitmask, scope)));
             std::pair<adjacency_iterator, bool> insertion = parents -> second.insert(
                 std::make_pair(this -> identifier(), std::make_pair(Bitmask(State::dataset.width(), false), scope)));
             insertion.first -> second.first.set(std::abs(feature) - 1, true);

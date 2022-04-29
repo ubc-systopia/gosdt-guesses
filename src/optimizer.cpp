@@ -103,7 +103,7 @@ bool Optimizer::iterate(unsigned int id) {
 }
 
 void Optimizer::print(void) const {
-    if (Configuration::verbose) { // print progress to standard output
+    if (!Configuration::verbose) { // print progress to standard output
         float lowerbound, upperbound;
         objective_boundary(& lowerbound, & upperbound);
         std::cout <<
@@ -112,6 +112,12 @@ void Optimizer::print(void) const {
             ", Boundary: " << this -> global_boundary <<
             ", Graph Size: " << State::graph.size() <<
             ", Queue Size: " << State::queue.size() << std::endl;
+        
+        std::cout << "\n\nFor graph, children: " << State::graph.children.size() <<
+            ", bounds: " << State::graph.bounds.size() <<
+            ", edges: " << State::graph.edges.size() <<
+            ", vertices: " << State::graph.vertices.size() <<
+            ", translations: " << State::graph.translations.size() << std::endl;
     }
 }
 

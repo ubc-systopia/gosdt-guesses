@@ -69,6 +69,7 @@ class GOSDT {
         // @param data_source: string containing a CSV of training_data
         // @modifies models: Set of models extracted from the optimization
         void fit(std::istream & data_source, std::unordered_set< Model > & models);
+        void test();
     private:
         // @param id: The worker ID of the current thread
         // @param optimizer: optimizer object which will assign work to the thread

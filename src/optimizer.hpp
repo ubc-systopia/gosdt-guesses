@@ -114,7 +114,7 @@ private:
 
     void signal_exploiters(adjacency_accessor & parents, Task & self, unsigned int id);
 
-    bool load_children(Task & task, Bitmask const & features, unsigned int id);
+    bool load_children(Task & task, Bitmask const & features, unsigned int id, bool is_root);
 
     bool load_parents(Tile const & identifier, adjacency_accessor & parents);
 

@@ -8,7 +8,7 @@
 
 float GOSDT::time = 0.0;
 unsigned int GOSDT::size = 0;
-unsigned int GOSDT::iterations = 0;
+unsigned int GOSDT::iterations = 1;
 unsigned int GOSDT::status = 0;
 
 double GOSDT::lower_bound;
@@ -29,7 +29,9 @@ GOSDT::~GOSDT(void) {
 
 void GOSDT::configure(std::istream & config_source) { Configuration::configure(config_source); }
 
+
 void GOSDT::fit(std::istream & data_source, std::string & result) {
+    test();
     std::unordered_set< Model > models;
     fit(data_source, models);
     json output = json::array();
@@ -40,6 +42,19 @@ void GOSDT::fit(std::istream & data_source, std::string & result) {
         output.push_back(object);
     }
     result = output.dump(2);
+}
+
+void GOSDT::test() {
+    // using MyMap = tbb::concurrent_hash_map<int, int>;
+    // MyMap objects;
+    // MyMap::accessor accessor1;
+    // std::cout << "INSERT <1, 5> = " << std::boolalpha << objects.insert(accessor1, std::make_pair(1, 5)) << std::endl;
+    // std::cout << "Accessor1: Key = " << accessor1->first << "; Object = " << accessor1->second << std::endl;
+
+    // // In either case, the calling thread will be blocked
+    // MyMap::const_accessor accessor2;
+    // //MyMap::accessor accessor2;
+    // std::cout << "Find = " << std::boolalpha << objects.find(accessor2, 2) << std::endl;
 }
 
 void GOSDT::fit(std::istream & data_source, std::unordered_set< Model > & models) {
@@ -139,6 +154,7 @@ void GOSDT::fit(std::istream & data_source, std::unordered_set< Model > & models
             // there might be a timeout here...
             if (GOSDT::time > (float)Configuration::time_limit || !State::queue.empty()) {
                 std::cout << "possible timeout: " << GOSDT::time << " " << Configuration::time_limit << " queue emtpy: "  << State::queue.empty() << std::endl;
+                std::cout << "uncertainty is: " << optimizer.uncertainty() << std::endl;
                 GOSDT::status = 2;
             } else {
                 std::cout << "possible non-convergence: [" << lowerbound << " .. " << upperbound << "]" << std::endl;
@@ -153,6 +169,65 @@ void GOSDT::fit(std::istream & data_source, std::unordered_set< Model > & models
         }
 
         optimizer.models(models);
+
+        Tile root = models.begin() -> identifier;
+        bound_accessor bounds;
+        State::graph.bounds.find(bounds, root);
+
+        bool wrong = false;
+        int wrong_feature = 0;
+        Task wrong_task, wrong_task2;
+
+        for (auto i = bounds -> second.begin(); i != bounds -> second.end(); i ++) {
+            int feature = std::get<0>(*i);
+            std::cout << (feature + 1) << ". [" << std::get<1>(*i) << ", " << std::get<2>(*i) << "]    ";
+            child_accessor child;
+            vertex_accessor ver;
+            State::graph.children.find(child, std::make_pair(root, -1 * (feature + 1)));
+            State::graph.vertices.find(ver, child -> second);
+            Task task = ver -> second;
+            std::cout << task.lowerbound() << ", " << task.upperbound() << "   ";
+
+            State::graph.children.find(child, std::make_pair(root, feature + 1));
+            State::graph.vertices.find(ver, child -> second);
+            Task task2 = ver -> second;
+            std::cout << task2.lowerbound() << ", " << task2.upperbound() << std::endl;
+
+            if (std::abs(task.lowerbound() + task2.lowerbound() - std::get<1>(*i)) > std::numeric_limits<float>::epsilon()) {
+                wrong = true;
+                wrong_task = task;
+                wrong_task2 = task2;
+                wrong_feature = feature;
+            } else if (std::abs(task.upperbound() + task2.upperbound() - std::get<2>(*i)) > std::numeric_limits<float>::epsilon()) {
+                wrong = true;
+                wrong_task = task;
+                wrong_task2 = task2;
+                wrong_feature = feature;
+            }
+        }
+        if (wrong) {
+            std::cout << "\033[0;31m\nWRONG!!!\033[0m" << std::endl;
+            std::cout << "wrong feature" << (wrong_feature + 1) << std::endl;
+            // make sure wrong tasks could exploit
+            adjacency_accessor adj;
+            std::cout << "wrong task 1" << wrong_task.identifier().to_string() << std::endl;
+            State::graph.edges.find(adj, wrong_task.identifier());
+            for (auto it = adj -> second.begin(); it != adj -> second.end(); it ++) {
+                std::cout << it -> first.to_string() << std::endl;
+            }
+            
+            std::cout << "\nwrong task 2" << wrong_task2.identifier().to_string() << std::endl;
+            for (auto it = adj -> second.begin(); it != adj -> second.end(); it ++) {
+                std::cout << it -> first.to_string() << std::endl;
+            }
+        }
+
+        // for (auto adj = State::graph.edges.begin(); adj != State::graph.edges.end(); adj ++) {
+        //     std::cout << "Child " << adj -> first.to_string() << std::endl;
+        //     for (auto se = adj -> second.begin(); se != adj -> second.end(); se ++) {
+        //         std::cout << "Parent " << se -> first.to_string() << " Feature " << se -> second.first.to_string() << " Scope " << se -> second.second << std::endl;
+        //     }
+        // }
 
         if (Configuration::model_limit > 0 && models.size() == 0) {
             GOSDT::status = 1;

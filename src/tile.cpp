@@ -33,6 +33,8 @@ unsigned int Tile::size(void) const { return this -> _content.size(); }
 
 void Tile::resize(unsigned int new_size) { this -> _content.resize(new_size); }
 
+unsigned int Tile::count(void) const { return this -> _content.count(); }
+
 Bitmask & Tile::content(void) { return this -> _content; }
 void Tile::content(Bitmask const & _new_content) { this -> _content = _new_content; }
 

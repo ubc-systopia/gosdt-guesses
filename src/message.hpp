@@ -59,7 +59,6 @@ public:
     Bitmask recipient_capture;
     Bitmask recipient_feature;
 
-    int feature;
     Bitmask features;
     Bitmask signs;
     float scope;

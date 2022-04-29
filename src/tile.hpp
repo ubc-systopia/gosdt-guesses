@@ -38,6 +38,8 @@ public:
     unsigned int size(void) const;
     void resize(unsigned int new_size);
 
+    unsigned int count(void) const;
+
     std::string to_string(void) const;
 
 private:

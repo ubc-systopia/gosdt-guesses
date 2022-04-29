@@ -2,6 +2,14 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
     bool global_update = false;
     switch (message.code) {
         case Message::exploration_message: {
+
+            // std::cout << "\n\n\n" << std::endl;
+            // std::cout << "Explore Dispatched! " << id << "\n";
+            // std::cout << "Sender Tile " << message.sender_tile.to_string() << "\n";
+            // std::cout << "Recipient Capture " << message.recipient_capture.to_string() << "\n";
+            // std::cout << "Recipient Feature " << message.recipient_feature.to_string() << "\n";
+            // std::cout << "Features " << message.features.to_string() << "\n";
+            // std::cout << "Scope " << message.scope << "\n";
             
             // A message travelling downward in the dependency graph
             Tile const & parent = message.sender_tile;               // The points captured
@@ -12,7 +20,6 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
             task.scope(message.scope);
             task.create_children(id); // Populate the thread's local cache with child instances
             if (Configuration::feature_exchange || Configuration::continuous_feature_exchange) { task.prune_features(id); } // Prune using a set of bounds
-            translation_type order;
             State::dataset.tile(task.capture_set(), task.feature_set(), task.identifier(), task.order(), id);
 
 
@@ -29,6 +36,7 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
                 vertex -> second.update(vertex -> second.lowerbound(), root_upperbound, -1);
                 this -> root = vertex -> second.identifier();
                 this -> translator = vertex -> second.order();
+                // std::cout << "Bound to set: " << vertex -> second.lowerbound() << vertex -> second.upperbound() << "\n\n" << std::endl;
                 global_update = update_root(vertex -> second.lowerbound(), vertex -> second.upperbound());
             } else { // Connect and signal parents
                 adjacency_accessor parents;
@@ -49,12 +57,23 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
             load_self(identifier, vertex);
 
             if (vertex -> second.uncertainty() == 0 || (false && vertex -> second.lowerbound() >= vertex -> second.upperscope() - std::numeric_limits<float>::epsilon())) { break; }
-            bool update = load_children(vertex -> second, message.features, id);
 
             // if (!update) { break; } // XXX Please check if this check still applies 
 
+            // std::cout << "\n\n\n" << std::endl;
+            // std::cout << "Exploitation Dispatched! " << id << "\n";
+            // std::cout << "Sender Tile " << message.sender_tile.to_string() << "\n";
+            // std::cout << "Recipient Tile " << message.recipient_tile.to_string() << "\n";
+            // std::cout << "Features " << message.features.to_string() << " " << message.features.count() << " Bound to set: " << vertex -> second.lowerbound() << " " << vertex -> second.upperbound() << "\n\n" << std::endl;
+
             bool is_root = vertex -> second.capture_set().count() == vertex -> second.capture_set().size();
+            bool update = load_children(vertex -> second, message.features, id, is_root);
             if (is_root) { // Update the optimizer state
+                // std::cout << "\n\n\n" << std::endl;
+                // std::cout << "Exploitation To Root Dispatched! " << id << "\n";
+                // std::cout << "Sender Tile " << message.sender_tile.to_string() << "\n";
+                // std::cout << "Recipient Tile " << message.recipient_tile.to_string() << "\n";
+                // std::cout << "Features " << message.features.to_string() << " " << message.features.count() << " Bound to set: " << vertex -> second.lowerbound() << " " << vertex -> second.upperbound() << "\n\n" << std::endl;
                 global_update = update_root(vertex -> second.lowerbound(),  vertex -> second.upperbound());
             } else {
                 adjacency_accessor parents; // find backward look-up entry
@@ -73,7 +92,7 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
     return global_update;
 }
 
-bool Optimizer::load_children(Task & task, Bitmask const & signals, unsigned int id) {
+bool Optimizer::load_children(Task & task, Bitmask const & signals, unsigned int id, bool is_root) {
     float lower = task.base_objective(), upper = task.base_objective();
     int optimal_feature = -1;
     bound_accessor bounds;
@@ -112,6 +131,8 @@ bool Optimizer::load_children(Task & task, Bitmask const & signals, unsigned int
 
                 std::get<1>(* iterator) = split_lower;
                 std::get<2>(* iterator) = split_upper;
+            } else if (is_root) {
+                std::cout << "NOT READY BECAUSE CHILDREN ARE NOT IN GRAPH " << feature << std::endl;
             }
         }
 
@@ -155,7 +176,9 @@ bool Optimizer::load_children(Task & task, Bitmask const & signals, unsigned int
         if (std::get<2>(* iterator) < upper) { optimal_feature = std::get<0>(* iterator); }
         lower = std::min(lower, std::get<1>(* iterator));
         upper = std::min(upper, std::get<2>(* iterator));
+        // std::cout << std::get<1>(* iterator) << " " << std::get<2>(* iterator) << std::endl;
     }
+    // std::cout << "\n" << lower << " " << upper << std::endl;
     return task.update(lower, upper, optimal_feature);
 }
 
@@ -252,5 +275,6 @@ bool Optimizer::update_root(float lower, float upper) {
     this -> global_upperbound = upper;
     this -> global_lowerbound = std::min(this -> global_upperbound, this -> global_lowerbound);
     this -> global_boundary = global_upperbound - global_lowerbound;
+    // std::cout << "Boundary: " << this -> global_lowerbound << ", " << this -> global_upperbound << std::endl;
     return change;
 }
