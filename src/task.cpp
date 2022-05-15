@@ -208,6 +208,8 @@ void Task::send_explorer(Task const & child, float scope, int feature, unsigned 
         State::graph.vertices.find(child, key -> second);
         if (scope < child -> second.upperscope()) {
             adjacency_accessor parents;
+            State::graph.translations.insert(std::make_pair(std::make_pair(this -> identifier(), feature), order())); // insert translation
+            State::graph.children.insert(std::make_pair(std::make_pair(this -> identifier(), feature), key -> second)); // insert forward look-up entry
             State::graph.edges.find(parents, child -> second.identifier()); // insert backward look-up entry
             std::pair<adjacency_iterator, bool> insertion = parents -> second.insert(
                 std::make_pair(this -> identifier(), std::make_pair(Bitmask(State::dataset.width(), false), scope)));
