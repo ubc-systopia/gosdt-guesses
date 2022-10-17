@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/c++",
+                "${workspaceFolder}/include/**",
+                "${workspaceFolder}/src/**",
+                "/opt/homebrew/Cellar/**",
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": []
+            },
+            "macFrameworkPath": [
+                "/System/Library/Frameworks",
+                "/Library/Frameworks"
+            ],
+            "intelliSenseMode": "macos-clang-x64",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++11"
+        }
+    ],
+    "version": 4
+}

@@ -1,6 +1,10 @@
 # A very basic scons build, that may not mirror all functionality
 # Contact tynanseltzer@gmail.com
 
+import os
+
+DefaultEnvironment(tools=[])
+
 shared_files = ['src/bitmask.cpp',
                     'src/configuration.cpp',
                     'src/task.cpp',
@@ -18,7 +22,20 @@ shared_files = ['src/bitmask.cpp',
                     'src/state.cpp',
                     'src/gosdt.cpp']
 
-env = Environment(CCFLAGS = '-std=gnu++11 -O3 -Wall -I include', CPPPATH = ["/usr/local/include", "/usr/include"])
+ENV_VAR_CPPPATH = os.environ.get('CPATH')
+CPPPATH = ['/usr/local/include', '/usr/include']
+CPPPATH.extend(ENV_VAR_CPPPATH.split(':'))
+
+ENV_VAR_LIBPATH = os.environ.get('LIBRARY_PATH')
+LIBPATH = ['/usr/local/lib', '/usr/lib']
+LIBPATH.extend(ENV_VAR_LIBPATH.split(':'))
+
+print(CPPPATH)
+print(LIBPATH)
+
+env = Environment(ENV = os.environ, CCFLAGS = '-std=gnu++11 -O3 -Wall -I include -pthread', CPPPATH = CPPPATH, CPATH = ENV_VAR_CPPPATH, LIBRARY_PATH = ENV_VAR_LIBPATH)
+env['ENV']['TERM'] = os.environ['TERM']
+env['TARGET_ARCH'] = "arm"
 conf = Configure(env)
 if not conf.CheckCXXHeader('tbb/scalable_allocator.h'):
     print("A header file was not found, please ensure that you have the correct version of tbb (2020_U3) which is NOT the most recent version")
@@ -32,7 +49,7 @@ if not conf.CheckCXXHeader("boost/dynamic_bitset.hpp"):
     print("Missing boost")
     Exit(1)
 env.Program(target='bin/gosdt', source= shared_files + ['src/main.cpp'], LIBS = ['tbb', 'tbbmalloc',
-'gmp', 'pthread'], LIBPATH = ['/usr/local/lib', '/usr/lib'])
+'gmp', 'pthread'], LIBPATH = LIBPATH)
 env.Program(target = 'bin/gosdt_tests', source = shared_files + ['test/test.cpp'], LIBS = ['tbb', 'tbbmalloc', 'gmp', 'pthread'],
-LIBPATH = ['/usr/local/lib', '/usr/lib'])
+LIBPATH = LIBPATH)
 

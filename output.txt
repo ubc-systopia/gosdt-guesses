@@ -1,0 +1,70 @@
+gosdt-unknown (20210915-162422 on unknown)
+Generalized Optimal Sparse Decision Tree
+Using data set: experiments/datasets/test.csv
+Using configuration: {
+  "allow_small_reg": false,
+  "balance": false,
+  "cancellation": true,
+  "continuous_feature_exchange": false,
+  "costs": "",
+  "depth_budget": 3,
+  "diagnostics": false,
+  "feature_exchange": false,
+  "feature_transform": true,
+  "look_ahead": true,
+  "model": "",
+  "model_limit": 1,
+  "non_binary": false,
+  "path_to_labels": "",
+  "precision_limit": 0,
+  "profile": "",
+  "reference_LB": false,
+  "regularization": 0.0010000000474974513,
+  "rule_list": false,
+  "similar_support": false,
+  "stack_limit": 0,
+  "time_limit": 1,
+  "timing": "",
+  "trace": "",
+  "tree": "",
+  "uncertainty_tolerance": 0.0,
+  "upperbound": 0.0,
+  "verbose": true,
+  "worker_limit": 1
+}
+Initializing Optimization Framework
+Feature Index: 0, Feature Name: feature
+  Inferred Type: Integral, Empirical Cardinality: 5, Optionality: 0
+Feature Index: 1, Feature Name: target
+  Inferred Type: Categorical, Empirical Cardinality: 5, Optionality: 0
+Original Dataset Dimension: 5 x 2
+Binary Dataset Dimension: 5 x 10
+Dataset Dimensions: 5 x 5 x 5
+Regularization smaller than 1/(num_samples) - this may lead to longer training time if not adjusted.
+Regularization increased to 1/(num_samples) = 0. To allow regularization below this, set allow_small_reg to true
+Starting Optimization
+Time: 0.000485, Objective: [0.6, 1], Boundary: 0.4, Graph Size: 1, Queue Size: 8
+Time: 0.00061, Objective: [1, 1], Boundary: 0, Graph Size: 9, Queue Size: 0
+Optimization Complete
+Optimization Complete
+Training Duration: 0 seconds
+Number of Iterations: 9 iterations
+Size of Graph: 9 nodes
+Training Duration (user time): 0 seconds
+Training Duration (system time)0 seconds
+Maximim memory: 0 kB
+Number of swaps0
+Size of Search Graph: 9 nodes
+Objective Boundary: [1, 1]
+Optimality Gap: 0
+Models Generated: 1
+Loss: 0.8
+Complexity: 0.2
+[
+  {
+    "complexity": 0.20000000298023224,
+    "loss": 0.800000011920929,
+    "name": "target",
+    "prediction": "elephant"
+  }
+]

@@ -1,18 +1,9 @@
 {
-    "uncertainty_tolerance": 0.0,
     "regularization": 0.001,
-    "time_limit": 86400,
-    "worker_limit": 4,
-    "tile_limit": 1,
-    "model_limit": 1,
-    "verbose": true,
-    "diagnostics": false,
-    "weight": false,
-    "balance": false,
-    "look_ahead": true,
     "similar_support": false,
-    "greedy_sampling": false,
-    "cancellation": true,
-    "indifference": false,
-    "strong_indifference": false
+    "strong_indifference": false,
+    "verbose": true,
+    "time_limit": 1,
+    "worker_limit": 1,
+    "depth_budget": 3
 }
