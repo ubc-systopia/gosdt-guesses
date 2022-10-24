@@ -1,10 +1,6 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include "bitmask.hpp"
-#include "task.hpp"
-#include "tile.hpp"
-
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -15,7 +11,11 @@
 #include <tbb/concurrent_vector.h>
 #include <tbb/scalable_allocator.h>
 
-//class Graph;
+class Graph;
+
+#include "bitmask.hpp"
+#include "task.hpp"
+#include "tile.hpp"
 
 typedef Tile key_type;
 typedef Task value_type;

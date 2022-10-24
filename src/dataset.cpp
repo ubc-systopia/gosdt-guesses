@@ -1,5 +1,4 @@
 #include "dataset.hpp"
-#include "state.hpp"
 
 Dataset::Dataset(void) {}
 Dataset::~Dataset(void) {}
