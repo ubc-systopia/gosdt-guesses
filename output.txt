@@ -2,7 +2,6 @@ gosdt-unknown (20210915-162422 on unknown)
 Generalized Optimal Sparse Decision Tree
 Using data set: experiments/datasets/test.csv
 Using configuration: {
-  "allow_small_reg": false,
   "balance": false,
   "cancellation": true,
   "continuous_feature_exchange": false,
@@ -33,38 +32,277 @@ Using configuration: {
   "worker_limit": 1
 }
 Initializing Optimization Framework
-Feature Index: 0, Feature Name: feature
-  Inferred Type: Integral, Empirical Cardinality: 5, Optionality: 0
+Feature Index: 0, Feature Name: feat1
+  Inferred Type: Categorical, Empirical Cardinality: 4, Optionality: 0
 Feature Index: 1, Feature Name: target
-  Inferred Type: Categorical, Empirical Cardinality: 5, Optionality: 0
-Original Dataset Dimension: 5 x 2
-Binary Dataset Dimension: 5 x 10
-Dataset Dimensions: 5 x 5 x 5
-Regularization smaller than 1/(num_samples) - this may lead to longer training time if not adjusted.
-Regularization increased to 1/(num_samples) = 0. To allow regularization below this, set allow_small_reg to true
+  Inferred Type: Categorical, Empirical Cardinality: 2, Optionality: 0
+Original Dataset Dimension: 4 x 2
+Binary Dataset Dimension: 4 x 6
+Dataset Dimensions: 4 x 4 x 2
+
+Row bitmasks:
+0. 000110
+1. 010010
+2. 001001
+3. 100001
+
+Costs: 
+0 0.25 
+0.25 0 
+
 Starting Optimization
-Time: 0.000485, Objective: [0.6, 1], Boundary: 0.4, Graph Size: 1, Queue Size: 8
-Time: 0.00061, Objective: [1, 1], Boundary: 0, Graph Size: 9, Queue Size: 0
+Push to queue! 0000
+0. 1110
+1. 0001
+0. 1011
+1. 0100
+0. 1101
+1. 0010
+0. 0111
+1. 1000
+[0.003, 0.252]
+[0.003, 0.252]
+[0.003, 0.252]
+[0.003, 0.252]
+Exploring!
+Parent: 0 : 0 : 000010001111110001101001
+Capture Set: 1111
+Feature Set: 1111
+Features: 0000
+Signs: 0000
+Task features: 1111
+
+Push to queue! 1000
+Push to queue! 1000
+Push to queue! 0100
+Push to queue! 0100
+Push to queue! 0010
+Push to queue! 0010
+Push to queue! 0001
+Push to queue! 0001
+Time: 0.000156, Objective: [0.003, 0.252], Boundary: 0.249, Graph Size: 1, Queue Size: 8, Explored: 1, Exploited: 0
+0. 1110
+1. 0000
+0. 1010
+1. 0100
+0. 1100
+1. 0010
+0. 0110
+1. 1000
+[0.252, 0.252]
+[0.002, 0.002]
+[0.252, 0.252]
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 1110
+Feature Set: 1111
+Features: 1000
+Signs: 0000
+Task features: 0111
+
+Push to queue! 1000
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 0001
+Feature Set: 1111
+Features: 1000
+Signs: 1000
+Task features: 0000
+
+Push to queue! 1000
+But it exists.
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 0100
+Feature Set: 1111
+Features: 0100
+Signs: 0100
+Task features: 0000
+
+Push to queue! 0100
+But it exists.
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 1000
+Feature Set: 1111
+Features: 0001
+Signs: 0001
+Task features: 0000
+
+Push to queue! 0001
+But it exists.
+0. 1100
+1. 0001
+0. 1001
+1. 0100
+0. 1101
+1. 0000
+0. 0101
+1. 1000
+[0.002, 0.002]
+[0.252, 0.252]
+[0.252, 0.252]
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 1101
+Feature Set: 1111
+Features: 0010
+Signs: 0000
+Task features: 1101
+
+Push to queue! 0010
+But it exists.
+0. 0110
+1. 0001
+0. 0011
+1. 0100
+0. 0101
+1. 0010
+0. 0111
+1. 0000
+[0.252, 0.252]
+[0.002, 0.002]
+[0.252, 0.252]
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 0111
+Feature Set: 1111
+Features: 0001
+Signs: 0000
+Task features: 1110
+
+Push to queue! 0001
+But it exists.
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 0010
+Feature Set: 1111
+Features: 0010
+Signs: 0010
+Task features: 0000
+
+Push to queue! 0010
+But it exists.
+0. 1010
+1. 0001
+0. 1011
+1. 0000
+0. 1001
+1. 0010
+0. 0011
+1. 1000
+[0.252, 0.252]
+[0.252, 0.252]
+[0.002, 0.002]
+Exploring!
+Parent: 0 : 3 : 1111
+Capture Set: 1011
+Feature Set: 1111
+Features: 0100
+Signs: 0000
+Task features: 1011
+
+Push to queue! 0100
+But it exists.
+Exploiting!
+Identifier: 0 : 3 : 1111
+
+Time: 0.000508, Objective: [0.003, 0.003], Boundary: 0, Graph Size: 9, Queue Size: 0, Explored: 9, Exploited: 1
 Optimization Complete
 Optimization Complete
 Training Duration: 0 seconds
 Number of Iterations: 9 iterations
 Size of Graph: 9 nodes
-Training Duration (user time): 0 seconds
-Training Duration (system time)0 seconds
-Maximim memory: 0 kB
+Training Duration (user time): 0.000245 seconds
+Training Duration (system time)0.000272 seconds
+Maximim memory: 0.000245 kB
 Number of swaps0
 Size of Search Graph: 9 nodes
-Objective Boundary: [1, 1]
+Objective Boundary: [0.003, 0.003]
 Optimality Gap: 0
+Tile is: 0 : 2 : 0100
+Associated Task has bound: [0.001, 0.001]
+
+Tile is: 0 : 2 : 0010
+Associated Task has bound: [0.001, 0.001]
+
+Tile is: 0 : 2 : 1000
+Associated Task has bound: [0.001, 0.001]
+
+Tile is: 0 : 2 : 1101
+Associated Task has bound: [0.002, 0.002]
+Bound for feature 0 is [0.002, 0.002]
+Bound for feature 1 is [0.252, 0.252]
+Bound for feature 3 is [0.252, 0.252]
+
+Tile is: 0 : 2 : 1011
+Associated Task has bound: [0.002, 0.002]
+Bound for feature 0 is [0.252, 0.252]
+Bound for feature 2 is [0.252, 0.252]
+Bound for feature 3 is [0.002, 0.002]
+
+Tile is: 0 : 2 : 1110
+Associated Task has bound: [0.002, 0.002]
+Bound for feature 1 is [0.252, 0.252]
+Bound for feature 2 is [0.002, 0.002]
+Bound for feature 3 is [0.252, 0.252]
+
+Tile is: 0 : 2 : 0001
+Associated Task has bound: [0.001, 0.001]
+
+Tile is: 0 : 2 : 0111
+Associated Task has bound: [0.002, 0.002]
+Bound for feature 0 is [0.252, 0.252]
+Bound for feature 1 is [0.002, 0.002]
+Bound for feature 2 is [0.252, 0.252]
+
+Tile is: 0 : 3 : 1111
+Associated Task has bound: [0.003, 0.003]
+Bound for feature 0 is [0.003, 0.003]
+Bound for feature 1 is [0.003, 0.003]
+Associated positive Tile is: 0 : 2 : 0001
+Associated negative Tile is: 0 : 2 : 1110
+Bound for feature 2 is [0.003, 0.003]
+Associated positive Tile is: 0 : 2 : 0100
+Associated negative Tile is: 0 : 2 : 1011
+Bound for feature 3 is [0.003, 0.003]
+Associated positive Tile is: 0 : 2 : 0010
+Associated negative Tile is: 0 : 2 : 1101
+
 Models Generated: 1
-Loss: 0.8
-Complexity: 0.2
+Loss: 0
+Complexity: 0.003
 [
   {
-    "complexity": 0.20000000298023224,
-    "loss": 0.800000011920929,
-    "name": "target",
-    "prediction": "elephant"
+    "false": {
+      "false": {
+        "complexity": 0.0010000000474974513,
+        "loss": 0.0,
+        "name": "target",
+        "prediction": 1
+      },
+      "feature": 0,
+      "name": "feat1",
+      "reference": "purple",
+      "relation": "==",
+      "true": {
+        "complexity": 0.0010000000474974513,
+        "loss": 0.0,
+        "name": "target",
+        "prediction": 2
+      },
+      "type": "categorical"
+    },
+    "feature": 0,
+    "name": "feat1",
+    "reference": "blue",
+    "relation": "==",
+    "true": {
+      "complexity": 0.0010000000474974513,
+      "loss": 0.0,
+      "name": "target",
+      "prediction": 2
+    },
+    "type": "categorical"
   }
 ]

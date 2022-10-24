@@ -51,6 +51,8 @@ std::string Tile::to_string(void) const {
     // }
     stream << this -> _width;
     stream << " : ";
+    stream << (int)this -> _content.get_depth_budget();
+    stream << " : ";
     stream << this -> _content.to_string();
     return stream.str();
 }

@@ -17,6 +17,7 @@
 #include "dataset.hpp"
 #include "graph.hpp"
 #include "state.hpp"
+#include "bitmask.hpp"
 
 using json = nlohmann::json;
 

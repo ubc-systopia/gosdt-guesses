@@ -17,7 +17,7 @@
 #include <tbb/tick_count.h>
 #include <json/json.hpp>
 
-//#include <alloca.h>
+#include <alloca.h>
 
 #include "configuration.hpp"
 #include "dataset.hpp"
@@ -27,6 +27,7 @@
 #include "graph.hpp"
 #include "queue.hpp"
 #include "integrity_violation.hpp"
+#include "bitmask.hpp"
 
 using json = nlohmann::json;
 

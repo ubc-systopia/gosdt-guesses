@@ -1,4 +1,5 @@
 {
+    "uncertainty_tolerance": 0.0,
     "regularization": 0.001,
     "similar_support": false,
     "strong_indifference": false,

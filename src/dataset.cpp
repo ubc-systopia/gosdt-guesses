@@ -1,5 +1,4 @@
 #include "dataset.hpp"
-#include "state.hpp"
 
 Dataset::Dataset(void) {}
 Dataset::~Dataset(void) {}
@@ -27,6 +26,21 @@ void Dataset::load(std::istream & data_source) {
     
     if (Configuration::verbose) {
         std::cout << "Dataset Dimensions: " << height() << " x " << width() << " x " << depth() << std::endl;
+
+        std::cout << "\nRow bitmasks:" << std::endl;
+        for (int i = 0; i < height(); i ++) {
+            std::cout << i << ". " << this->rows[i].to_string() << std::endl;
+        }
+
+        std::cout << "\nCosts: " << std::endl;
+
+        for (unsigned int i = 0; i < depth(); ++i) {
+            for (unsigned int j = 0; j < depth(); ++j) {
+                std::cout << this->costs[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
     }
     return;
 }

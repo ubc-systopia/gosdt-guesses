@@ -9,14 +9,20 @@ Queue::~Queue(void) {
 }
 
 bool Queue::push(Message const & message) {
+    
+    std::cout << "Push to queue! " << message.features.to_string() << std::endl;
+
     message_type * internal_message = new message_type();
     * internal_message = message;
+
+    // this -> queue.push(internal_message);
 
     // Attempt to copy content into membership set
     if (this -> membership.insert(std::make_pair(internal_message, true))) {
         this -> queue.push(internal_message);
         return true;
     } else {
+        std::cout << "But it exists." << std::endl;
         delete internal_message;
         return false;
     }

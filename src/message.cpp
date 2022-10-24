@@ -17,7 +17,7 @@ void Message::exploration(Tile const & sender, Bitmask const & recipient_capture
     this -> sender_tile = sender;
     this -> recipient_capture = recipient_capture;
     this -> recipient_feature = recipient_feature;
-    
+
     if (feature != 0) {
         this -> features.clear();
         this -> features.set(std::abs(feature) - 1, true);

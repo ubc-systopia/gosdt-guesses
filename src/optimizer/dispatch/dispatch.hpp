@@ -2,7 +2,6 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
     bool global_update = false;
     switch (message.code) {
         case Message::exploration_message: {
-            
             // A message travelling downward in the dependency graph
             Tile const & parent = message.sender_tile;               // The points captured
             Bitmask const & capture_set = message.recipient_capture; // The points captured
@@ -21,6 +20,15 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
 
             store_children(vertex -> second, id);
 
+            std::cout << "Exploring!" << std::endl;
+            std::cout << "Parent: " << parent.to_string() << std::endl;
+            std::cout << "Capture Set: " << capture_set.to_string() << std::endl;
+            std::cout << "Feature Set: " << feature_set.to_string() << std::endl;
+            std::cout << "Features: " << message.features.to_string() << std::endl;
+            std::cout << "Signs: " << message.signs.to_string() << std::endl;
+            std::cout << "Task features: " << task.feature_set().to_string() << std::endl;
+            std::cout << std::endl;
+
             if (is_root) { // Update the optimizer state
                 // float root_upperbound = this -> cart(vertex -> second.capture_set(), vertex -> second.feature_set(), id);
                 // std::cout << "Cart: " << root_upperbound << std::endl;
@@ -36,22 +44,27 @@ bool Optimizer::dispatch(Message const & message, unsigned int id) {
                 signal_exploiters(parents, vertex -> second, id);
             }
 
-            if (Configuration::reference_LB || message.scope >= vertex -> second.upperscope()) {
+            if (true || message.scope >= vertex -> second.upperscope()) {
                 vertex -> second.send_explorers(message.scope, id);
             }
 
             break;
         }
         case Message::exploitation_message: {
+
             Tile const & identifier = message.recipient_tile;
             vertex_accessor vertex, left, right;
 
             load_self(identifier, vertex);
 
-            if (vertex -> second.uncertainty() == 0 || (!Configuration::reference_LB && vertex -> second.lowerbound() >= vertex -> second.upperscope() - std::numeric_limits<float>::epsilon())) { break; }
+            if (vertex -> second.uncertainty() == 0 || (false && vertex -> second.lowerbound() >= vertex -> second.upperscope() - std::numeric_limits<float>::epsilon())) { break; }
             bool update = load_children(vertex -> second, message.features, id);
 
             // if (!update) { break; } // XXX Please check if this check still applies 
+
+            std::cout << "Exploiting!" << std::endl;
+            std::cout << "Identifier: " << identifier.to_string() << std::endl;
+            std::cout << std::endl;
 
             bool is_root = vertex -> second.capture_set().count() == vertex -> second.capture_set().size();
             if (is_root) { // Update the optimizer state
@@ -206,6 +219,7 @@ void Optimizer::store_children(Task & task, unsigned int id) {
                 split_lower = left.lowerbound() + right.lowerbound();
                 split_upper = left.upperbound() + right.upperbound();
             }
+            std::cout << "[" << split_lower << ", " << split_upper << "]" << std::endl;
             bounds -> second.push_back(std::tuple<int, float, float>(j, split_lower, split_upper));
             if (split_lower > task.upperscope()) { continue; }
             if (split_upper < upper) { optimal_feature = j; }

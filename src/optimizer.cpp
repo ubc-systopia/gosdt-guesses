@@ -111,7 +111,9 @@ void Optimizer::print(void) const {
             ", Objective: [" << lowerbound << ", " << upperbound << "]" <<
             ", Boundary: " << this -> global_boundary <<
             ", Graph Size: " << State::graph.size() <<
-            ", Queue Size: " << State::queue.size() << std::endl;
+            ", Queue Size: " << State::queue.size() <<
+            ", Explored: " << this -> explore <<
+            ", Exploited: " << this -> exploit << std::endl;
     }
 }
 
