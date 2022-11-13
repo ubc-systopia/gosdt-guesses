@@ -2,6 +2,7 @@
 
 float Configuration::uncertainty_tolerance = 0.0;
 float Configuration::regularization = 0.05;
+bool Configuration::allow_small_reg = false;
 float Configuration::upperbound = 0.0;
 
 unsigned int Configuration::time_limit = 0;
@@ -41,8 +42,9 @@ void Configuration::configure(std::istream & source) {
 };
 
 void Configuration::configure(json config) {
-    if (config.contains("uncertainty_tolerance")) { Configuration::uncertainty_tolerance = config["uncertainty_tolerance"]; }
+    if (config.contains("uncertainty_tolerance")) { Configuration::uncertainty_tolerance = config["uncertainty_tolerance"].get<float>(); }
     if (config.contains("regularization")) { Configuration::regularization = config["regularization"]; }
+    if (config.contains("allow_small_reg")) { Configuration::allow_small_reg = config["allow_small_reg"]; }
     if (config.contains("upperbound")) { Configuration::upperbound = config["upperbound"]; }
 
     if (config.contains("time_limit")) { Configuration::time_limit = config["time_limit"]; }
@@ -62,7 +64,7 @@ void Configuration::configure(json config) {
         if (config.contains("warm_LB")) { Configuration::reference_LB = config["warm_LB"]; }
     }
     
-    if (config.contains("path_to_labels")) { Configuration::path_to_labels = config["path_to_labels"]; }
+    if (config.contains("path_to_labels")) { Configuration::path_to_labels = config["path_to_labels"].get<std::string>(); }
     // If config file specified to use reference model lower bounds, parse the necessary file path:
     if (Configuration::reference_LB) {
         if (!std::ifstream(Configuration::path_to_labels).good()) {
@@ -84,18 +86,19 @@ void Configuration::configure(json config) {
     if (config.contains("rule_list")) { Configuration::rule_list = config["rule_list"]; }
     if (config.contains("non_binary")) { Configuration::non_binary = config["non_binary"]; }
 
-    if (config.contains("costs")) { Configuration::costs = config["costs"]; }
-    if (config.contains("model")) { Configuration::model = config["model"]; }
-    if (config.contains("timing")) { Configuration::timing = config["timing"]; }
-    if (config.contains("trace")) { Configuration::trace = config["trace"]; }
-    if (config.contains("tree")) { Configuration::tree = config["tree"]; }
-    if (config.contains("profile")) { Configuration::profile = config["profile"]; }
+    if (config.contains("costs")) { Configuration::costs = config["costs"].get<std::string>(); }
+    if (config.contains("model")) { Configuration::model = config["model"].get<std::string>(); }
+    if (config.contains("timing")) { Configuration::timing = config["timing"].get<std::string>(); }
+    if (config.contains("trace")) { Configuration::trace = config["trace"].get<std::string>(); }
+    if (config.contains("tree")) { Configuration::tree = config["tree"].get<std::string>(); }
+    if (config.contains("profile")) { Configuration::profile = config["profile"].get<std::string>(); }
 }
 
 std::string Configuration::to_string(unsigned int spacing) {
     json obj = json::object();
     obj["uncertainty_tolerance"] = Configuration::uncertainty_tolerance;
     obj["regularization"] = Configuration::regularization;
+    obj["allow_small_reg"] = Configuration::allow_small_reg;
     obj["upperbound"] = Configuration::upperbound;
 
     obj["time_limit"] = Configuration::time_limit;
