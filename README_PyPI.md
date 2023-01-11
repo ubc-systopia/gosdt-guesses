@@ -280,65 +280,81 @@ import numpy as np
 import time
 import pathlib
 from sklearn.ensemble import GradientBoostingClassifier
-from model.threshold_guess import compute_thresholds
+from sklearn.model_selection import train_test_split
+from model.threshold_guess import compute_thresholds, cut
 from model.gosdt import GOSDT
 
 # read the dataset
-df = pd.read_csv("experiments/datasets/fico.csv")
-X, y = df.iloc[:,:-1].values, df.iloc[:,-1].values
+df = pd.read_csv("../experiments/datasets/compas.csv")
+X, y = df.iloc[:,:-1], df.iloc[:,-1]
 h = df.columns[:-1]
+
+# train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2021)
+print("X train shape:{}, X test shape:{}".format(X_train.shape, X_test.shape))
 
 # GBDT parameters for threshold and lower bound guesses
 n_est = 40
 max_depth = 1
 
-# guess thresholds
-X = pd.DataFrame(X, columns=h)
-print("X:", X.shape)
-print("y:",y.shape)
-X_train, thresholds, header, threshold_guess_time = compute_thresholds(X, y, n_est, max_depth)
-y_train = pd.DataFrame(y)
+# 1.guess thresholds
+X_train = pd.DataFrame(X_train, columns=h)
+X_test = pd.DataFrame(X_test, columns=h)
+X_train_guessed, thresholds, header, threshold_guess_time = compute_thresholds(X_train.copy(), y_train, n_est, max_depth)
+X_test_guessed = cut(X_test.copy(), thresholds)
+X_test_guessed = X_test_guessed[header]
+print("After guessing, X train shape:{}, X test shape:{}".format(X_train_guessed.shape, X_test_guessed.shape))
+print("train set column names == test set column names: {}".format(list(X_train_guessed.columns)==list(X_test_guessed.columns)))
 
-# guess lower bound
+
+
+# 2.guess lower bound
+import time
 start_time = time.perf_counter()
 clf = GradientBoostingClassifier(n_estimators=n_est, max_depth=max_depth, random_state=42)
-clf.fit(X_train, y_train.values.flatten())
-warm_labels = clf.predict(X_train)
+clf.fit(X_train_guessed, y_train.values.flatten())
+warm_labels = clf.predict(X_train_guessed)
+
 elapsed_time = time.perf_counter() - start_time
+
 lb_time = elapsed_time
 
-# save the labels from lower bound guesses as a tmp file and return the path to it.
+# save the labels as a tmp file and return the path to it.
 labelsdir = pathlib.Path('/tmp/warm_lb_labels')
 labelsdir.mkdir(exist_ok=True, parents=True)
+
 labelpath = labelsdir / 'warm_label.tmp'
 labelpath = str(labelpath)
-pd.DataFrame(warm_labels, columns=["class_labels"]).to_csv(labelpath, header="class_labels",index=None)
+pd.DataFrame(warm_labels).to_csv(labelpath, header="class_labels",index=None)
 
 
-# train GOSDT model
+
+# 3.train GOSDT model
 config = {
             "regularization": 0.001,
-            "depth_budget": 5,
+            "depth_budget": 6,
+            "time_limit": 60,
             "warm_LB": True,
             "path_to_labels": labelpath,
-            "time_limit": 60,
-            "similar_support": False
+            "similar_support": False,
         }
 
 model = GOSDT(config)
 
-model.fit(X_train, y_train)
+model.fit(X_train_guessed, y_train)
 
 print("evaluate the model, extracting tree and scores", flush=True)
 
-# get the results
-train_acc = model.score(X_train, y_train)
+# 4.get the results
+train_acc = model.score(X_train_guessed, y_train)
+test_acc = model.score(X_test_guessed, y_test)
 n_leaves = model.leaves()
 n_nodes = model.nodes()
 time = model.utime
 
 print("Model training time: {}".format(time))
 print("Training accuracy: {}".format(train_acc))
+print("Test accuracy: {}".format(test_acc))
 print("# of leaves: {}".format(n_leaves))
 print(model.tree)
 ```
@@ -346,53 +362,50 @@ print(model.tree)
 **Output**
 
 ```
-X: (10459, 23)
-y: (10459,)
+X train shape:(5525, 7), X test shape:(1382, 7)
+After guessing, X train shape:(5525, 17), X test shape:(1382, 17)
+train set column names == test set column names: True
 gosdt reported successful execution
-training completed. 1.658/0.098/1.756 (user, system, wall), mem=364 MB
-bounds: [0.290914..0.290914] (0.000000) loss=0.282914, iterations=13569
+training completed. 0.000/0.000/0.709 (user, system, wall), mem=0 MB
+bounds: [0.325914..0.325914] (0.000000) loss=0.318914, iterations=12342
 evaluate the model, extracting tree and scores
-Model training time: 1.6584229469299316
-Training accuracy: 0.7170857634573095
-# of leaves: 8
-if ExternalRiskEstimate<=67.5 = 1 and MSinceMostRecentInqexcl7days<=-7.5 = 1 then:
-    predicted class: 1
-    misclassification penalty: 0.027
-    complexity penalty: 0.001
-
-else if ExternalRiskEstimate<=67.5 != 1 and MSinceMostRecentInqexcl7days<=-7.5 = 1 then:
-    predicted class: 0
-    misclassification penalty: 0.006
-    complexity penalty: 0.001
-
-else if ExternalRiskEstimate<=74.5 = 1 and MSinceMostRecentInqexcl7days<=-7.5 != 1 and MSinceMostRecentInqexcl7days<=0.5 = 1 and PercentTradesWBalance<=80.5 = 1 then:
-    predicted class: 1
-    misclassification penalty: 0.071
-    complexity penalty: 0.001
-
-else if ExternalRiskEstimate<=74.5 != 1 and MSinceMostRecentInqexcl7days<=-7.5 != 1 and MSinceMostRecentInqexcl7days<=0.5 = 1 and PercentTradesWBalance<=80.5 = 1 then:
-    predicted class: 0
-    misclassification penalty: 0.061
-    complexity penalty: 0.001
-
-else if ExternalRiskEstimate<=78.5 = 1 and MSinceMostRecentInqexcl7days<=-7.5 != 1 and MSinceMostRecentInqexcl7days<=0.5 = 1 and PercentTradesWBalance<=80.5 != 1 then:
-    predicted class: 1
-    misclassification penalty: 0.033
-    complexity penalty: 0.001
-
-else if ExternalRiskEstimate<=78.5 != 1 and MSinceMostRecentInqexcl7days<=-7.5 != 1 and MSinceMostRecentInqexcl7days<=0.5 = 1 and PercentTradesWBalance<=80.5 != 1 then:
-    predicted class: 0
-    misclassification penalty: 0.005
-    complexity penalty: 0.001
-
-else if ExternalRiskEstimate<=67.5 = 1 and MSinceMostRecentInqexcl7days<=-7.5 != 1 and MSinceMostRecentInqexcl7days<=0.5 != 1 then:
+Model training time: 0.0
+Training accuracy: 0.6810859728506787
+Test accuracy: 0.6903039073806078
+# of leaves: 7
+if age<=21.5 = 1 then:
     predicted class: 1
     misclassification penalty: 0.026
     complexity penalty: 0.001
 
-else if ExternalRiskEstimate<=67.5 != 1 and MSinceMostRecentInqexcl7days<=-7.5 != 1 and MSinceMostRecentInqexcl7days<=0.5 != 1 then:
+else if age<=21.5 != 1 and age<=27.5 = 1 and priors_count<=1.5 = 1 then:
     predicted class: 0
-    misclassification penalty: 0.054
+    misclassification penalty: 0.053
+    complexity penalty: 0.001
+
+else if age<=21.5 != 1 and age<=27.5 = 1 and priors_count<=1.5 != 1 then:
+    predicted class: 1
+    misclassification penalty: 0.04
+    complexity penalty: 0.001
+
+else if age<=21.5 != 1 and age<=27.5 != 1 and age<=38.5 = 1 and priors_count<=3.5 = 1 then:
+    predicted class: 0
+    misclassification penalty: 0.068
+    complexity penalty: 0.001
+
+else if age<=21.5 != 1 and age<=27.5 != 1 and age<=38.5 = 1 and priors_count<=3.5 != 1 then:
+    predicted class: 1
+    misclassification penalty: 0.045
+    complexity penalty: 0.001
+
+else if age<=21.5 != 1 and age<=27.5 != 1 and age<=38.5 != 1 and priors_count<=7.5 = 1 then:
+    predicted class: 0
+    misclassification penalty: 0.067
+    complexity penalty: 0.001
+
+else if age<=21.5 != 1 and age<=27.5 != 1 and age<=38.5 != 1 and priors_count<=7.5 != 1 then:
+    predicted class: 1
+    misclassification penalty: 0.021
     complexity penalty: 0.001
 ```
 
