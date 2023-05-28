@@ -117,7 +117,6 @@ class GOSDT:
                 self.configuration["theta"] = None
             elif self.configuration["objective"] == "f1":
                 self.configuration["theta"] = None
-                self.configuration["w"] = None
             elif self.configuration["objective"] == "auc":
                 self.configuration["theta"] = None
                 self.configuration["w"] = None
@@ -274,7 +273,7 @@ class GOSDT:
         trains a model using the GOSDT pure Python implementation modified from OSDT
         """
 
-        encoder = Encoder(X.values[:,:], header=X.columns[:], mode="complete", target=y[y.columns[0]])
+        encoder = Encoder(X.values[:,:], header=X.columns[:], mode="none", target=y[y.columns[0]])
         headers = encoder.headers
 
         X = pd.DataFrame(encoder.encode(X.values[:,:]), columns=encoder.headers)
@@ -314,13 +313,13 @@ class GOSDT:
         else:
             decoded_leaves = []
             for leaf in leaves_c:
-                decoded_leaf = tuple((dic[j] if j > 0 else -dic[-j]) for j in leaf)
+                decoded_leaf = tuple((dic[j]+1 if j > 0 else -(dic[-j]+1)) for j in leaf)
                 decoded_leaves.append(decoded_leaf)
-            source = self.__translate__(dict(zip(decoded_leaves, pred_c)))
+            source = self.__translate__(dict(zip(decoded_leaves, pred_c)), headers)
         self.tree = TreeClassifier(source, encoder=encoder)
         self.tree.__initialize_training_loss__(X, y)
 
-    def __translate__(self, leaves):
+    def __translate__(self, leaves, headers):
         """
         Converts the leaves of OSDT into a TreeClassifier-compatible object
         """
@@ -334,8 +333,8 @@ class GOSDT:
         else:
             features = {}
             for leaf in leaves.keys():
-                if not leaf in features:
-                    for e in leaf:
+                for e in leaf:
+                    if not abs(e) in features:
                         features[abs(e)] = 1
                     else:
                         features[abs(e)] += 1
@@ -352,13 +351,15 @@ class GOSDT:
                     positive_leaves[tuple(s for s in leaf if s != split)] = prediction
                 else:
                     negative_leaves[tuple(s for s in leaf if s != -split)] = prediction
+            if split != None:
+                split = split-1
             return {
                 "feature": split,
-                "name": "feature_" + str(split),
+                "name": headers[split],
                 "reference": 1,
                 "relation": "==",
-                "true": self.__translate__(positive_leaves),
-                "false": self.__translate__(negative_leaves),
+                "true": self.__translate__(positive_leaves, headers),
+                "false": self.__translate__(negative_leaves, headers),
             }
 
     def __translate_cart__(self, tree, id=0, depth=-1):
