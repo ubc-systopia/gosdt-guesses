@@ -152,8 +152,9 @@ class TreeClassifier:
         
         predictions = []
         (n, m) = X.shape
+        samples = X.values
         for i in range(n):
-            prediction, _ = self.classify(X.values[i,:])
+            prediction, _ = self.classify(samples[i,:])
             predictions.append(prediction)
         return array(predictions)
 
