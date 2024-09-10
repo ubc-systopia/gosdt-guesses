@@ -44,11 +44,17 @@ def repair_wheel(wheel) -> None:
     Repair the generated wheel file by copying all required dynamic libraries to it
     :param wheel: Path to the generated wheel file
     """
-    # Fetch the current operating system
+    # Fetch the current operating system and architecture
     system = platform.system()
+    arch = platform.machine() 
+
     # Repair the wheel
     if system == "Darwin":
-        delocate_wheel(["-w", "dist", "-v", wheel])
+        if arch == "arm64":
+            print("Detected ARM64 architecture on macOS.")
+            delocate_wheel(["-w", "dist", "--plat", "macosx_11_0_arm64", "-v", wheel])
+        else:
+            delocate_wheel(["-w", "dist", "-v", wheel])
     elif system == "Linux":
         distribution = distro.id()
         if distribution == "ubuntu":
@@ -67,6 +73,7 @@ def repair_wheel(wheel) -> None:
     else:
         print("{} is not supported.".format(system))
         raise EnvironmentError
+
 
 
 def remove_dir_if_exists(str) -> None:
