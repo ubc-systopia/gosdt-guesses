@@ -51,7 +51,6 @@ def repair_wheel(wheel) -> None:
     # Repair the wheel
     if system == "Darwin":
         if arch == "arm64":
-            print("Detected ARM64 architecture on macOS.")
             delocate_wheel(["-w", "dist", "--plat", "macosx_11_0_arm64", "-v", wheel])
         else:
             delocate_wheel(["-w", "dist", "-v", wheel])
