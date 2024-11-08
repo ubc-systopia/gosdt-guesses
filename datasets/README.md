@@ -6,4 +6,6 @@ compas.csv (from [this repository](https://github.com/propublica/compas-analysis
 
 monk1.csv and monk2.csv are from a [UCI Machine Learning Repository dataset](https://archive.ics.uci.edu/dataset/70/monk+s+problems); this data has a CC-by-4.0 license. 
 
+tic-tac-toe.csv is from a [UCI Machine Learning Repository dataset](https://archive.ics.uci.edu/dataset/101/tic+tac+toe+endgame); this data has a CC-by-4.0 license.
+
 spiral.csv contains a synthetic 2D dataset created as a part of our 2022 AAAI paper.
