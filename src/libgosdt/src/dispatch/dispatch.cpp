@@ -232,7 +232,7 @@ void Optimizer::store_children(Task &task, unsigned int id) {
             upper = std::min(upper, split_upper);
         }
     }
-    if (lower > this->_upperscope) { return; } // similar reason to check on line 169. If all children out of scope, 
+    if (lower > task.upperscope()) { return; } // similar reason to check on line 169. If all children out of scope, 
                                                // and base risk out of scope, don't update bound.
     task.update(m_config, lower, upper, optimal_feature);
 }
