@@ -166,6 +166,10 @@ bool Optimizer::load_children(Task &task, Bitmask const &signals, unsigned int i
         lower = std::min(lower, std::get<1>(*iterator));
         upper = std::min(upper, std::get<2>(*iterator));
     }
+    if (lower > task.upperscope()) { return; } // if lower is > upperscope, then lower may not be a true lower bound b/c of line 160.
+                                               // (In this case, base objective and all splits are all above upper scope, and 
+                                               //   no splits were used to update the bounds, though the splits may still have been 
+                                               //   better than the base risk). 
     return task.update(m_config, lower, upper, optimal_feature);
 }
 
@@ -228,6 +232,8 @@ void Optimizer::store_children(Task &task, unsigned int id) {
             upper = std::min(upper, split_upper);
         }
     }
+    if (lower > this->_upperscope) { return; } // similar reason to check on line 169. If all children out of scope, 
+                                               // and base risk out of scope, don't update bound.
     task.update(m_config, lower, upper, optimal_feature);
 }
 
