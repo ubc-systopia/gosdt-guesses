@@ -1,7 +1,8 @@
 # External imports
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin, check_X_y
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils import check_X_y
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.utils.validation import check_array, check_is_fitted
     
