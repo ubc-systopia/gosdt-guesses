@@ -6,7 +6,7 @@ from sklearn.utils import check_X_y
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.utils.validation import check_array, check_is_fitted
     
-class ThresholdGuessBinarizer(BaseEstimator, TransformerMixin):
+class ThresholdGuessBinarizer(TransformerMixin, BaseEstimator):
     f"""
     Encode numerical features as a one-hot numeric array. 
     The encoding is based on the thresholds found by a Gradient Boosting Classifier.

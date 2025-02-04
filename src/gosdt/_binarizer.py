@@ -30,7 +30,7 @@ def _halfway_points(values):
     """
     return [(values[i] + values[i + 1]) / 2 for i in range(len(values) - 1)]
 
-class NumericBinarizer(BaseEstimator, TransformerMixin):
+class NumericBinarizer(TransformerMixin, BaseEstimator):
     f"""
     Encode numerical features as a one-hot numeric array.
 
