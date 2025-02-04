@@ -212,8 +212,7 @@ class NumericBinarizer(BaseEstimator, TransformerMixin):
         # Check that the input is of the same shape as the one passed
         # during fit.
         if X.shape[1] != self.n_features_in_:
-            raise ValueError('Shape of input is different form what was seen'
-                             'in `fit`')
+            raise ValueError(f"X has {X.shape[1]} features, but NumericBinarizer is expecting {self.n_features_in_} features as input")
 
         # Return a binarization of the input samples based on halfway point splits
         Xb_lists = [[X[:, i] <= val for val in _halfway_points(self.column_values_[i])] for i in range(self.n_features_in_)]
@@ -243,8 +242,8 @@ class NumericBinarizer(BaseEstimator, TransformerMixin):
         # Check that the input is of the same shape as the one passed
         # during fit.
         if Xt.shape[1] != self.n_features_out_:
-            raise ValueError('Shape of input is different from what was seen '
-                             'in `fit`')
+            raise ValueError(f"X has {Xt.shape[1]} features, but NumericBinarizer.inverse_transform is expecting {self.n_features_out_} features as input")
+
 
         # Initialize an empty array for inverse transformed data
         X = np.empty((Xt.shape[0], self.n_features_in_))

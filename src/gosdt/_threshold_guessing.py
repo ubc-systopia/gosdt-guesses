@@ -216,8 +216,7 @@ class ThresholdGuessBinarizer(BaseEstimator, TransformerMixin):
         # Check that the input is of the same shape as the one passed
         # during fit.
         if X.shape[1] != self.n_features_in_:
-            raise ValueError('Shape of input is different from what was seen'
-                             'in `fit`')
+            raise ValueError(f"X has {X.shape[1]} features, but ThresholdBinarizer is expecting {self.n_features_in_} features as input")
 
         return np.concatenate([np.atleast_2d(X[:, j] <= thresh).T for j, thresh in self.thresholds_], axis=1).astype(float)
     
