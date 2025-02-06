@@ -18,6 +18,10 @@ bool Optimizer::dispatch(Message const &message, unsigned int id) {
 
             vertex_accessor vertex;
             bool inserted = store_self(task.capture_set(), task, vertex);
+            // if this subproblem already existed, we still have to update the scope
+            if (!inserted) {
+                vertex -> second.scope(message.scope);
+            }
 
             store_children(vertex->second, id);
 
@@ -166,10 +170,11 @@ bool Optimizer::load_children(Task &task, Bitmask const &signals, unsigned int i
         lower = std::min(lower, std::get<1>(*iterator));
         upper = std::min(upper, std::get<2>(*iterator));
     }
-    if (lower > task.upperscope()) { return false; } // if lower is > upperscope, then lower may not be a true lower bound b/c of line 160.
-                                                     // (In this case, base objective and all splits are all above upper scope, and 
-                                                     //   no splits were used to update the bounds, though the splits may still have been 
-                                                     //   better than the base risk). 
+    if (lower > task.upperscope()) { 
+        return task.update(m_config, task.upperscope(), upper, optimal_feature); 
+    } // ^ if lower is > upperscope, then lower may not be a true lower bound b/c of line 160.
+      // (In this case, base objective and all splits are all above upper scope, 
+      // but we do not know the exact lower bound)
     return task.update(m_config, lower, upper, optimal_feature);
 }
 
@@ -188,9 +193,6 @@ bool Optimizer::store_self(Bitmask const &identifier, Task const &value, vertex_
 void Optimizer::store_children(Task &task, unsigned int id) {
     bound_accessor bounds;
     bool inserted = m_graph.bounds.insert(bounds, task.capture_set());
-    if (!inserted) {
-        return;
-    }
     int optimal_feature = -1;
     float lower = task.base_objective(), upper = task.base_objective();
     Bitmask const &features = task.feature_set();
@@ -221,7 +223,10 @@ void Optimizer::store_children(Task &task, unsigned int id) {
                 split_lower = left.lowerbound() + right.lowerbound();
                 split_upper = left.upperbound() + right.upperbound();
             }
-            bounds->second.push_back(std::tuple<int, float, float>(j, split_lower, split_upper));
+            if (inserted) {
+                // If we're visiting children for the first time in our graph, store bounds
+                bounds->second.push_back(std::tuple<int, float, float>(j, split_lower, split_upper));
+            }
             if (split_lower > task.upperscope()) {
                 continue;
             }
@@ -232,8 +237,11 @@ void Optimizer::store_children(Task &task, unsigned int id) {
             upper = std::min(upper, split_upper);
         }
     }
-    if (lower > task.upperscope()) { return; } // similar reason to check on line 169. If all children out of scope, 
-                                               // and base risk out of scope, don't update bound.
+    if (lower > task.upperscope()) { 
+        task.update(m_config, task.upperscope(), upper, optimal_feature);
+        return; 
+    } // ^ similar reason to check in load_children. Don't know exact lb, 
+      // just that it exceeds the upperscope()
     task.update(m_config, lower, upper, optimal_feature);
 }
 
@@ -267,7 +275,7 @@ void Optimizer::signal_exploiters(adjacency_accessor &parents, Task &self, unsig
             self.uncertainty() > 0) {
             continue;
         }
-        m_local_states[id].outbound_message.exploitation(self.capture_set(),                    // sender tile
+        m_local_states[id].outbound_message.exploitation(self.capture_set(),                   // sender tile
                                                          iterator->first,                      // recipient tile
                                                          iterator->second.first,               // recipient features
                                                          self.support() - self.lowerbound());  // priority
