@@ -22,6 +22,7 @@ This work builds on a number of innovations for scalable construction of optimal
 ## Table of Contents
 
 - [Installation](#installation)
+- [Configuration](#configuration)
 - [Example](#example)
 - [Frequently Asked Questions](#faq)
 - [How to build the project](#how-to-build-the-project)
@@ -39,7 +40,57 @@ pip3 install gosdt
 ```
 
 Note: Our x86_64 wheels all use modern ISA extensions such AVX to perform fast bitmap operations. 
-If you're running on an older system where that's not possible, we recommend that you build from source following the [instructions bellow](#how-to-build-the-project).
+If you're running on an older system where that's not possible, we recommend that you build from source following the [instructions below](#how-to-build-the-project).
+
+## Configuration
+
+    regularization : float, default=0.05
+        The regularization penalty incurred for each leaf in the model. We 
+        highly recommend setting the regularization to a value larger than 
+        1 / (# of samples). A small regularization will lead to a longer 
+        training time. If a smaller regularization (than 1 / (# of samples)) is
+        preferredm you mus set the parameter `allow_small_reg` to True, which
+        by default is False.
+
+    allow_small_reg : bool, default=False
+        Boolean flag for allowing a regularization that's less than 1 / (# of samples).
+        If False the effective regularization is bounded below by 1 / (# of samples).
+
+    depth_budget : int | None, default=None
+        Sets the maximum tree depth for a solution model, counting a tree with just 
+        the root node as a tree of depth 0 
+
+    time_limit: int | None, default=None
+        A time limit (in seconds) upon which the algorithm will terminate. If
+        the time limit is reached without a solution being found, the algorithm will terminate with an error.
+
+    balance: bool, default=False
+        A boolean flag enabling overriding the sample importance by equalizing the importance of each present class.
+
+    cancellation: bool, default=True
+        A boolean flag enabling the propagation of task cancellations up the dependency graph.
+
+    look_ahead: bool, default=True
+        A boolean flag enabling the one-step look-ahead bound implemented via scopes.
+
+    similar_support: bool, default=True
+        A boolean flag enabling the similar support bound implemented via a distance index.
+
+    rule_list: bool, default=False
+        A boolean flag enabling rule-list constraints on models.
+
+    non_binary: bool, default=False
+        A boolean flag enabling non-binary model trees. 
+        #todo(Ilias: Our tree parser does not currently handle this flag)        
+
+    diagnostics: bool, default=False
+        A boolean flag enabling printing of diagnostic traces when an error is encountered.
+        This is intended for debugging the C++ logic and is not intended for end-user use.
+        
+    debug: bool, default=False
+        A boolean flag that enables saving the state of the optimization, so that it can be
+        inspected or ran again in the future. This is intended for debugging the C++ logic and 
+        is not intended for end-user use.
 
 ## Example
 
@@ -97,6 +148,7 @@ print(f"Model training time: {clf.result_.time}")
 print(f"Training accuracy: {clf.score(X_train_guessed, y_train)}")
 print(f"Test accuracy: {clf.score(X_test_guessed, y_test)}")
 ```
+
 
 ## FAQ
 
