@@ -44,6 +44,8 @@ If you're running on an older system where that's not possible, we recommend tha
 
 ## Configuration
 
+When initializing a `GOSDTClassifier` object, the following hyperparameters can be specified: 
+
     regularization : float, default=0.05
         The regularization penalty incurred for each leaf in the model. We 
         highly recommend setting the regularization to a value larger than 
@@ -91,6 +93,25 @@ If you're running on an older system where that's not possible, we recommend tha
         A boolean flag that enables saving the state of the optimization, so that it can be
         inspected or ran again in the future. This is intended for debugging the C++ logic and 
         is not intended for end-user use.
+
+When calling `fit`, the following arguments are available: 
+
+        X : array-like of shape (n_samples, n_features)
+            The training input samples. Boolean values are expected.
+
+        y : array-like of shape (n_samples,)
+            The target values. The target values can be binary or multiclass.
+        
+        input_features : array-like of shape (n_features,) | None, default=None
+            The feature names for the input data. If None, the feature names will be set to ["x0", "x1", ...].
+            
+        y_ref : array-like of shape (n_samples,) | None, default=None
+            Theese represent the predictions made by some blackbox model, that will be used to guide optimization.
+            The reference labels can be binary or multiclass, but must have the same classes and shape as y.
+
+        cost_matrix : array-like of shape (n_classes, n_classes) | None, default=None
+            The cost matrix for the optimization. If None, a cost matrix will be created based on 
+            the number of classes and whether a balanced cost matrix is requested.
 
 ## Example
 
