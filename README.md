@@ -88,6 +88,9 @@ When initializing a `GOSDTClassifier` object, the following hyperparameters can 
     diagnostics: bool, default=False
         A boolean flag enabling printing of diagnostic traces when an error is encountered.
         This is intended for debugging the C++ logic and is not intended for end-user use.
+
+    model_limit: int, default=1
+        The maximum number of optimal models to extract, in the case of multiple optima.
         
     debug: bool, default=False
         A boolean flag that enables saving the state of the optimization, so that it can be
