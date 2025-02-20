@@ -233,6 +233,9 @@ class GOSDTClassifier(ClassifierMixin, BaseEstimator):
             if set(unique_labels(y_ref)) != set(self.classes_):
                 raise ValueError(
                     f"y_ref must have the same classes as y ({self.classes_}), but has classes: {unique_labels(y_ref)}.")
+            self.reference_LB = True # set flag to indicate using reference LB (needed for correct scope behaviour)
+        else:
+            self.reference_LB = False
 
         # Check that X is boolean
         if not np.all(np.logical_or(X == 0, X == 1)):
@@ -432,6 +435,7 @@ class GOSDTClassifier(ClassifierMixin, BaseEstimator):
             self.config_.upperbound_guess = self.upperbound_guess
         self.config_.model_limit = self.model_limit
         self.config_.worker_limit = self.worker_limit
+        self.config_.reference_LB = self.reference_LB
 
     def __create_cost_matrix(self, y, custom_cost_matrix: None) -> FloatMatrix:
         cost_matrix = custom_cost_matrix
