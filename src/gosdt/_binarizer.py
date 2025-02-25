@@ -291,10 +291,10 @@ class NumericBinarizer(TransformerMixin, BaseEstimator):
         check_is_fitted(self, ['n_features_in_', 'n_features_out_', 'column_values_', 'feature_names_in_'])
         
         # Create the feature map
-        ret = {}
+        ret = []
         idx = 0
         for i, col in enumerate(self.column_values_):
-            ret[i] = list(range(idx, idx + len(col) - 1))
+            ret.append(set(range(idx, idx + len(col) - 1)))
             idx += len(col) - 1
         return ret
     

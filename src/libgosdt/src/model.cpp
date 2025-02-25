@@ -217,7 +217,6 @@ void Model::summarize(json &node) const {
 
 void Model::to_json(json &node, const Dataset &dataset) const {
     _to_json(node, dataset);
-    decode_json(dataset, node);
     // Convert to N-ary
     if (dataset.m_config.non_binary) {
         summarize(node);
@@ -231,6 +230,7 @@ void Model::_to_json(json &node, const Dataset &dataset) const {
         node["complexity"] = dataset.m_config.regularization;
     } else {
         node["feature"] = this->binary_feature;
+        node["orig_feature"] = this->feature;
         node["false"] = json::object();
         node["true"] = json::object();
         this->negative->_to_json(node["false"], dataset);
@@ -281,17 +281,5 @@ void Model::translate_json(json &node, translation_type const &main, translation
             node["false"] = node["swap"];
             node.erase("swap");
         }
-    }
-}
-
-void Model::decode_json(const Dataset &dataset, json &node) const {
-    if (node.contains("feature")) {
-        // index decoding from binary feature to original feature space
-        unsigned int binary_feature_index = node["feature"];
-        size_t feature_index = dataset.original_feature(binary_feature_index);
-
-        node["feature"] = feature_index;
-        decode_json(dataset, node["false"]);
-        decode_json(dataset, node["true"]);
     }
 }
