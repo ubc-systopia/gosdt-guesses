@@ -64,7 +64,7 @@ bool Optimizer::dispatch(Message const &message, unsigned int id) {
             bool is_root = vertex->second.capture_set().count() == vertex->second.capture_set().size();
             if (is_root) {  // Update the optimizer state
                 global_update = update_root(vertex->second.lowerbound(), vertex->second.upperbound());
-            } else {
+            } else if (update) {
                 adjacency_accessor parents;  // find backward look-up entry
                 load_parents(identifier, parents);
                 signal_exploiters(parents, vertex->second, id);  // Signal parents
