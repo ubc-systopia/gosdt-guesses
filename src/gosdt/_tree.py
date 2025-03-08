@@ -18,14 +18,14 @@ class Leaf:
 
 class Node:
 
-    def __init__(self, feature: int, left_child, right_child):
+    def __init__(self, feature: int, orig_feature: int, left_child, right_child):
         self.feature = feature
+        self.orig_feature = orig_feature
         self.left_child = left_child
         self.right_child = right_child
 
     def __str__(self) -> str:
-        return "{ feature: " + str(self.feature) + " [ left child: " + str(self.left_child) + ", right child: " + str(self.right_child) + "] }"
-
+        return "{ feature: " + str(self.feature) + ", orig feature: " +str(self.orig_feature) + ", [ left child: " + str(self.left_child) + ", right child: " + str(self.right_child) + "] }"
 
 class Tree:
     # Left is TRUE, Right is FALSE
@@ -43,7 +43,8 @@ class Tree:
             left_child = create_tree(json_object["true"])
             right_child = create_tree(json_object["false"])
             feature = json_object["feature"]
-            return Node(feature, left_child, right_child)
+            orig_feature = json_object["orig_feature"]
+            return Node(feature, orig_feature, left_child, right_child)
 
         self.tree = create_tree(json_result)
         self.features = features

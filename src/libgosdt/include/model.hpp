@@ -73,7 +73,6 @@ class Model {
     void to_json(json &node, const Dataset &dataset) const;
     void _to_json(json &node, const Dataset &dataset) const;
 
-    void decode_json(const Dataset &dataset, json &node) const;
     void translate_json(json &node, translation_type const &main, translation_type const &alternative,
                         unsigned int n_features) const;
 
