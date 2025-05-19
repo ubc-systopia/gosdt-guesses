@@ -4,5 +4,5 @@ This document lists the Maintainers of Project InterpretML. Maintainers may be a
 
 | **NAME** | **Organization** |
 | --- | --- |
-| Hayden McTavish | |
-| Margo Seltzer | |
+| Hayden McTavish | Duke University|
+| Margo Seltzer | University of British Columbia|
